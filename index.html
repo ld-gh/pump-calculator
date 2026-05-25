@@ -290,7 +290,28 @@
     // ========== НАСТРОЙКИ SUPABASE (ЗАМЕНИТЕ НА СВОИ) ==========
     const SUPABASE_URL = 'https://sifudxpuhuuolkztefrb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZnVkeHB1aHV1b2xrenRlZnJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDEwNTksImV4cCI6MjA5NTI3NzA1OX0.LsveQ2iX17IyUTMhEa_VK2Zy6GkXWrvsd0CqzU4og8E';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let supabase = null;
+
+function initSupabase() {
+    return new Promise((resolve) => {
+        if (window.supabase) {
+            resolve(window.supabase);
+        } else {
+            const interval = setInterval(() => {
+                if (window.supabase) {
+                    clearInterval(interval);
+                    resolve(window.supabase);
+                }
+            }, 100);
+        }
+    });
+}
+
+initSupabase().then((supabaseModule) => {
+    supabase = supabaseModule.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase готов');
+    checkSession();
+});
     
     // DOM элементы
     const loginScreen = document.getElementById('loginScreen');
