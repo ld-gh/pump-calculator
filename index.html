@@ -10,225 +10,87 @@
     <meta name="apple-mobile-web-app-title" content="Насосы СМ">
     <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 16px;
-            color: #0f172a;
+            background: #f1f5f9; margin: 0; padding: 16px; color: #0f172a;
         }
-
-        .container {
-            max-width: 650px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 650px; margin: 0 auto; }
         .card {
-            background: white;
-            border-radius: 24px;
-            padding: 20px 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: white; border-radius: 24px; padding: 20px 16px;
+            margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
         .card-header {
-            font-weight: 600;
-            font-size: 1.25rem;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #1e293b;
-            border-left: 4px solid #3b82f6;
-            padding-left: 12px;
+            font-weight: 600; font-size: 1.25rem; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 8px; color: #1e293b;
+            border-left: 4px solid #3b82f6; padding-left: 12px;
         }
-
-        .mass-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
+        .mass-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .mass-row label {
-            font-weight: 500;
-            background: #eef2ff;
-            padding: 8px 14px;
-            border-radius: 40px;
-            font-size: 0.9rem;
+            font-weight: 500; background: #eef2ff; padding: 8px 14px;
+            border-radius: 40px; font-size: 0.9rem;
         }
-
         input, select {
-            font-size: 1rem;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid #cbd5e1;
-            background: white;
-            font-family: inherit;
+            font-size: 1rem; padding: 10px 12px; border-radius: 16px;
+            border: 1px solid #cbd5e1; background: white; font-family: inherit;
         }
-
         input:focus, select:focus {
-            outline: none;
-            border-color: #3b82f6;
+            outline: none; border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
-
-        .mass-input {
-            flex: 1;
-            min-width: 120px;
-        }
-
+        .mass-input { flex: 1; min-width: 120px; }
         button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 12px 24px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
+            background: #3b82f6; color: white; border: none; border-radius: 40px;
+            padding: 12px 24px; font-weight: 600; font-size: 1rem; cursor: pointer;
+            transition: background 0.2s;
         }
-
-        button:active {
-            transform: scale(0.97);
-            background: #2563eb;
-        }
-
-        button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .calc-btn {
-            width: 100%;
-            margin-top: 8px;
-            font-size: 1.1rem;
-            padding: 14px;
-        }
-
-        .logout-btn {
-            background: #ef4444;
-            width: auto;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-        }
-
-        .logout-btn:active {
-            background: #dc2626;
-        }
-
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
+        button:active { transform: scale(0.97); background: #2563eb; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.7; }
+        .calc-btn { width: 100%; margin-top: 8px; font-size: 1.1rem; padding: 14px; }
+        .logout-btn { background: #ef4444; width: auto; padding: 8px 16px; font-size: 0.9rem; }
+        .logout-btn:active { background: #dc2626; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .table-wrapper {
-            overflow-x: auto;
-            overflow-y: visible;
-            margin: 0 -16px;
-            padding: 0 16px;
-            -webkit-overflow-scrolling: touch;
+            overflow-x: auto; overflow-y: visible; margin: 0 -16px;
+            padding: 0 16px; -webkit-overflow-scrolling: touch;
         }
-
-        .pumps-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-
+        .pumps-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .pumps-table th, .pumps-table td {
-            padding: 8px 4px;
-            text-align: center;
-            border-bottom: 1px solid #e2e8f0;
-            vertical-align: middle;
-            white-space: nowrap;
+            padding: 8px 4px; text-align: center; border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle; white-space: nowrap;
         }
-
         .pumps-table th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #334155;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            background: #f8fafc; font-weight: 600; color: #334155;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .pumps-table input, .pumps-table select {
-            width: 90px;
-            min-width: 70px;
-            padding: 8px 4px;
-            font-size: 0.8rem;
-            border-radius: 12px;
-            text-align: center;
+            width: 90px; min-width: 70px; padding: 8px 4px; font-size: 0.8rem;
+            border-radius: 12px; text-align: center;
         }
-
         .result-time {
-            font-weight: 700;
-            background: #eef2ff;
-            border-radius: 20px;
-            padding: 6px 12px;
-            display: inline-block;
-            min-width: 70px;
-            font-size: 0.9rem;
-            color: #1e40af;
+            font-weight: 700; background: #eef2ff; border-radius: 20px;
+            padding: 6px 12px; display: inline-block; min-width: 70px;
+            font-size: 0.9rem; color: #1e40af;
         }
-
         .badge-pump {
-            font-weight: 600;
-            background: #e2e8f0;
-            border-radius: 30px;
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            display: inline-block;
+            font-weight: 600; background: #e2e8f0; border-radius: 30px;
+            padding: 4px 8px; font-size: 0.75rem; display: inline-block;
         }
-
         .footer-note {
-            text-align: center;
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 20px;
+            text-align: center; font-size: 0.7rem; color: #64748b; margin-top: 20px;
         }
-
-        .hidden {
-            display: none;
+        .hidden { display: none !important; }
+        .error { color: #dc2626; font-size: 0.8rem; margin-top: 12px; text-align: center; }
+        .login-container { max-width: 400px; margin: 50px auto; }
+        .login-title { text-align: center; margin-bottom: 24px; color: #1e293b; }
+        .loading-badge {
+            background: #fbbf24; color: #78350f; padding: 4px 10px;
+            border-radius: 20px; font-size: 0.75rem; font-weight: 600;
         }
-
-        .error {
-            color: #dc2626;
-            font-size: 0.8rem;
-            margin-top: 12px;
-            text-align: center;
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-        }
-
-        .login-title {
-            text-align: center;
-            margin-bottom: 24px;
-            color: #1e293b;
-        }
-
         @media (max-width: 550px) {
-            .pumps-table th, .pumps-table td {
-                padding: 8px 4px;
-            }
-            .pumps-table input, .pumps-table select {
-                font-size: 0.8rem;
-                padding: 6px 4px;
-            }
-            .card {
-                padding: 16px;
-            }
+            .pumps-table th, .pumps-table td { padding: 8px 4px; }
+            .pumps-table input, .pumps-table select { font-size: 0.8rem; padding: 6px 4px; }
+            .card { padding: 16px; }
         }
     </style>
 </head>
@@ -240,7 +102,7 @@
         <h2 class="login-title">🔐 Вход для дилеров</h2>
         <input type="email" id="email" placeholder="Email дилера" required>
         <input type="password" id="password" placeholder="Пароль" required>
-        <button id="loginBtn">Войти</button>
+        <button id="loginBtn" disabled>⏳ Загрузка...</button>
         <div id="loginError" class="error"></div>
     </div>
 </div>
@@ -287,32 +149,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // ========== НАСТРОЙКИ SUPABASE (ЗАМЕНИТЕ НА СВОИ) ==========
+    // ========== НАСТРОЙКИ SUPABASE ==========
     const SUPABASE_URL = 'https://sifudxpuhuuolkztefrb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZnVkeHB1aHV1b2xrenRlZnJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDEwNTksImV4cCI6MjA5NTI3NzA1OX0.LsveQ2iX17IyUTMhEa_VK2Zy6GkXWrvsd0CqzU4og8E';
-    let supabase = null;
-
-function initSupabase() {
-    return new Promise((resolve) => {
-        if (window.supabase) {
-            resolve(window.supabase);
-        } else {
-            const interval = setInterval(() => {
-                if (window.supabase) {
-                    clearInterval(interval);
-                    resolve(window.supabase);
-                }
-            }, 100);
-        }
-    });
-}
-
-initSupabase().then((supabaseModule) => {
-    supabase = supabaseModule.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('✅ Supabase готов');
-    checkSession();
-});
     
+    let supabase = null;
+    let isSupabaseReady = false;
+    let calculatorInitialized = false;
+    let inputHandler = null;
+
     // DOM элементы
     const loginScreen = document.getElementById('loginScreen');
     const appScreen = document.getElementById('appScreen');
@@ -321,12 +166,30 @@ initSupabase().then((supabaseModule) => {
     const loginError = document.getElementById('loginError');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
-    
-    // Функция записи входа в таблицу
+
+    // ========== ИНИЦИАЛИЗАЦИЯ SUPABASE ==========
+    async function initSupabaseClient() {
+        // Ждём загрузки CDN-скрипта
+        while (!window.supabase) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        isSupabaseReady = true;
+        console.log('✅ Supabase готов');
+        
+        // Активируем кнопку входа
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Войти';
+        
+        // Проверяем сессию
+        await checkSession();
+    }
+
+    // ========== ЛОГИРОВАНИЕ ВХОДА ==========
     async function logLogin(dealerEmail) {
+        if (!supabase) return;
         try {
             const userAgent = navigator.userAgent;
-            // IP адрес получаем через бесплатный сервис
             const ipRes = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipRes.json();
             
@@ -335,28 +198,28 @@ initSupabase().then((supabaseModule) => {
                 user_agent: userAgent,
                 ip_address: ipData.ip
             }]);
-            
-            if (error) console.error('Ошибка логирования:', error);
+            if (error) console.warn('⚠️ Ошибка логирования:', error);
         } catch(e) {
-            console.log('Ошибка логирования:', e);
+            console.warn('⚠️ Ошибка логирования:', e);
         }
     }
-    
-    // Функция входа
+
+    // ========== ВХОД ==========
     async function handleLogin() {
-        // Очищаем предыдущую ошибку
+        if (!isSupabaseReady || !supabase) {
+            loginError.textContent = '⏳ Сервис загружается...';
+            return;
+        }
+
         loginError.textContent = '';
-        
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         
-        // Простая валидация
         if (!email || !password) {
             loginError.textContent = 'Введите email и пароль';
             return;
         }
         
-        // Делаем кнопку неактивной на время запроса
         loginBtn.disabled = true;
         loginBtn.textContent = 'Вход...';
         
@@ -367,7 +230,7 @@ initSupabase().then((supabaseModule) => {
             });
             
             if (error) {
-                console.error('Ошибка авторизации:', error);
+                console.error('❌ Ошибка авторизации:', error);
                 loginError.textContent = 'Неверный email или пароль';
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Войти';
@@ -375,27 +238,25 @@ initSupabase().then((supabaseModule) => {
             }
             
             if (data?.user) {
-                // Записываем факт входа (не ждём результата)
+                // Логируем вход (не блокируя интерфейс)
                 logLogin(data.user.email);
                 
-                // Показываем основной экран
                 loginScreen.classList.add('hidden');
                 appScreen.classList.remove('hidden');
-                
-                // Инициализируем калькулятор
                 initCalculator();
             }
-            
         } catch (err) {
-            console.error('Ошибка:', err);
+            console.error('❌ Ошибка:', err);
             loginError.textContent = 'Ошибка соединения. Проверьте интернет.';
             loginBtn.disabled = false;
             loginBtn.textContent = 'Войти';
         }
     }
-    
-    // Проверка сессии при загрузке
+
+    // ========== ПРОВЕРКА СЕССИИ ==========
     async function checkSession() {
+        if (!supabase) return;
+        
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
@@ -404,37 +265,28 @@ initSupabase().then((supabaseModule) => {
                 await logLogin(session.user.email);
                 initCalculator();
             } else {
-                // Убеждаемся, что экран входа виден
                 loginScreen.classList.remove('hidden');
                 appScreen.classList.add('hidden');
             }
         } catch(e) {
-            console.error('Ошибка проверки сессии:', e);
+            console.error('❌ Ошибка проверки сессии:', e);
             loginScreen.classList.remove('hidden');
             appScreen.classList.add('hidden');
         }
     }
-    
-    // НАВЕШИВАЕМ ОБРАБОТЧИКИ
-    loginBtn.onclick = handleLogin;
-    
-    // Вход по клавише Enter
-    emailInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-    passwordInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-    
-    // Выход
-    logoutBtn.onclick = async () => {
+
+    // ========== ВЫХОД ==========
+    async function handleLogout() {
+        if (!supabase) return;
         await supabase.auth.signOut();
         appScreen.classList.add('hidden');
         loginScreen.classList.remove('hidden');
         emailInput.value = '';
         passwordInput.value = '';
-    };
-    
+        // Сбрасываем калькулятор при следующем входе
+        calculatorInitialized = false;
+    }
+
     // ========== КАЛЬКУЛЯТОР ==========
     const AGENT_NAMES = ['Средство А', 'Средство Б', 'Средство В', 'Средство Г', 'Средство Д', 'Средство Е'];
     const PUMP_COUNT = 6;
@@ -466,9 +318,7 @@ initSupabase().then((supabaseModule) => {
             const option = document.createElement('option');
             option.value = AGENT_NAMES[i];
             option.textContent = AGENT_NAMES[i];
-            if (i === index % AGENT_NAMES.length) {
-                option.selected = true;
-            }
+            if (i === index % AGENT_NAMES.length) option.selected = true;
             select.appendChild(option);
         }
         tdAgent.appendChild(select);
@@ -536,6 +386,10 @@ initSupabase().then((supabaseModule) => {
     }
     
     function initCalculator() {
+        // Защита от повторной инициализации
+        if (calculatorInitialized) return;
+        calculatorInitialized = true;
+        
         buildTable();
         calculateAll();
         
@@ -545,23 +399,38 @@ initSupabase().then((supabaseModule) => {
         calcButton.onclick = calculateAll;
         laundryMass.oninput = calculateAll;
         
-        document.addEventListener('input', (e) => {
-            if (e.target.classList && (e.target.classList.contains('calib') || e.target.classList.contains('norm'))) {
+        // Создаём обработчик один раз
+        inputHandler = (e) => {
+            if (e.target.classList && 
+                (e.target.classList.contains('calib') || e.target.classList.contains('norm'))) {
                 calculateAll();
             }
-        });
+        };
+        document.addEventListener('input', inputHandler);
     }
-    
-    // Запуск проверки сессии
-    checkSession();
+
+    // ========== ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        // Навешиваем обработчики сразу (они безопасны благодаря проверкам внутри)
+        loginBtn.onclick = handleLogin;
+        logoutBtn.onclick = handleLogout;
+        
+        // Enter в полях входа
+        emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        
+        // Инициализируем Supabase
+        initSupabaseClient();
+    });
 </script>
 
 <script>
+    // Service Worker для PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('SW registered:', reg);
+            console.log('✅ SW registered:', reg);
         }).catch(err => {
-            console.log('SW error:', err);
+            console.warn('⚠️ SW error:', err);
         });
     }
 </script>
