@@ -5,55 +5,239 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Калькулятор насосов СМ</title>
     <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Насосы СМ">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: system-ui, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #f1f5f9;
             margin: 0;
             padding: 16px;
+            color: #0f172a;
         }
-        .container { max-width: 400px; margin: 50px auto; }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
         .card {
             background: white;
             border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 12px;
-            border: 1px solid #cbd5e1;
+
+        .card-header {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+        }
+
+        .mass-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .mass-row label {
+            font-weight: 500;
+            background: #eef2ff;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+
+        input, select {
             font-size: 1rem;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-family: inherit;
         }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .mass-input {
+            flex: 1;
+            min-width: 120px;
+        }
+
         button {
             background: #3b82f6;
             color: white;
             border: none;
+            border-radius: 40px;
+            padding: 12px 24px;
             font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
         }
-        .error { color: red; font-size: 0.8rem; margin-top: 8px; }
-        .hidden { display: none; }
+
+        button:active {
+            transform: scale(0.97);
+            background: #2563eb;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .calc-btn {
+            width: 100%;
+            margin-top: 8px;
+            font-size: 1.1rem;
+            padding: 14px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            width: auto;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:active {
+            background: #dc2626;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            overflow-y: visible;
+            margin: 0 -16px;
+            padding: 0 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .pumps-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .pumps-table th, .pumps-table td {
+            padding: 8px 4px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .pumps-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pumps-table input, .pumps-table select {
+            width: 90px;
+            min-width: 70px;
+            padding: 8px 4px;
+            font-size: 0.8rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
         .result-time {
+            font-weight: 700;
             background: #eef2ff;
             border-radius: 20px;
             padding: 6px 12px;
-            font-weight: 700;
+            display: inline-block;
+            min-width: 70px;
+            font-size: 0.9rem;
+            color: #1e40af;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px; text-align: center; border-bottom: 1px solid #e2e8f0; }
-        input[type="number"], select { width: 80px; padding: 6px; border-radius: 8px; }
-        .table-wrapper { overflow-x: auto; }
+
+        .badge-pump {
+            font-weight: 600;
+            background: #e2e8f0;
+            border-radius: 30px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #1e293b;
+        }
+
+        @media (max-width: 550px) {
+            .pumps-table th, .pumps-table td {
+                padding: 8px 4px;
+            }
+            .pumps-table input, .pumps-table select {
+                font-size: 0.8rem;
+                padding: 6px 4px;
+            }
+            .card {
+                padding: 16px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div id="loginScreen" class="container">
+<!-- ЭКРАН АВТОРИЗАЦИИ -->
+<div id="loginScreen" class="login-container">
     <div class="card">
-        <h2>Вход для дилеров</h2>
+        <h2 class="login-title">🔐 Вход для дилеров</h2>
         <input type="email" id="email" placeholder="Email дилера" required>
         <input type="password" id="password" placeholder="Пароль" required>
         <button id="loginBtn">Войти</button>
@@ -61,23 +245,43 @@
     </div>
 </div>
 
+<!-- ОСНОВНОЙ ЭКРАН С КАЛЬКУЛЯТОРОМ -->
 <div id="appScreen" class="container hidden">
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="card-header">⚖️ Калькулятор насосов</div>
-            <button id="logoutBtn" style="width: auto; background: #ef4444;">Выйти</button>
+        <div class="header-row">
+            <div class="card-header" style="border-left: none; padding-left: 0;">⚖️ Калькулятор насосов</div>
+            <button id="logoutBtn" class="logout-btn">🚪 Выйти</button>
         </div>
-        <label>Масса белья (кг):</label>
-        <input type="number" id="laundryMass" value="5.0" step="0.1">
+        <div class="mass-row">
+            <label>Масса сухого белья (кг)</label>
+            <input type="number" id="laundryMass" class="mass-input" value="5.0" step="0.1" placeholder="кг">
+        </div>
+        <div style="font-size:0.7rem; color:#475569; margin-top: 10px;">
+            * Используется для всех насосов
+        </div>
     </div>
+
     <div class="card">
+        <div class="card-header">🧴 Насосы & Средства</div>
         <div class="table-wrapper">
-            <table id="pumpsTable">
-                <thead><tr><th>№</th><th>Калибровка мл/30с</th><th>Средство</th><th>Норма мл/кг</th><th>Время (сек)</th></tr></thead>
+            <table class="pumps-table" id="pumpsTable">
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Калибровка<br><span style="font-weight:normal">мл за 30 сек</span></th>
+                    <th>Качает<br>средство</th>
+                    <th>Норма<br><span style="font-weight:normal">мл / кг белья</span></th>
+                    <th>Время<br><span style="font-weight:normal">(секунд)</span></th>
+                </tr>
+                </thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
-        <button id="calcButton">🔄 ПЕРЕСЧИТАТЬ</button>
+        <button id="calcButton" class="calc-btn">🔄 ПЕРЕСЧИТАТЬ</button>
+        <div class="footer-note">
+            ⚡ Время работы насоса = (масса × норма) / (калибровка / 30)<br>
+            🕒 Округление до целых секунд
+        </div>
     </div>
 </div>
 
@@ -94,6 +298,8 @@
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const loginError = document.getElementById('loginError');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
     
     // Функция записи входа в таблицу
     async function logLogin(dealerEmail) {
@@ -103,59 +309,112 @@
             const ipRes = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipRes.json();
             
-            await supabase.from('dealer_logins').insert([{
+            const { error } = await supabase.from('dealer_logins').insert([{
                 dealer_email: dealerEmail,
                 user_agent: userAgent,
                 ip_address: ipData.ip
             }]);
+            
+            if (error) console.error('Ошибка логирования:', error);
         } catch(e) {
             console.log('Ошибка логирования:', e);
         }
     }
     
-    // Вход
-    loginBtn.onclick = async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+    // Функция входа
+    async function handleLogin() {
+        // Очищаем предыдущую ошибку
+        loginError.textContent = '';
         
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
         
-        if (error) {
-            loginError.textContent = 'Ошибка: неверный email или пароль';
-        } else {
-            // Записываем факт входа
-            await logLogin(email);
-            // Показываем основной экран
-            loginScreen.classList.add('hidden');
-            appScreen.classList.remove('hidden');
-            initCalculator();
+        // Простая валидация
+        if (!email || !password) {
+            loginError.textContent = 'Введите email и пароль';
+            return;
         }
-    };
+        
+        // Делаем кнопку неактивной на время запроса
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Вход...';
+        
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) {
+                console.error('Ошибка авторизации:', error);
+                loginError.textContent = 'Неверный email или пароль';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Войти';
+                return;
+            }
+            
+            if (data?.user) {
+                // Записываем факт входа (не ждём результата)
+                logLogin(data.user.email);
+                
+                // Показываем основной экран
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                
+                // Инициализируем калькулятор
+                initCalculator();
+            }
+            
+        } catch (err) {
+            console.error('Ошибка:', err);
+            loginError.textContent = 'Ошибка соединения. Проверьте интернет.';
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Войти';
+        }
+    }
+    
+    // Проверка сессии при загрузке
+    async function checkSession() {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                await logLogin(session.user.email);
+                initCalculator();
+            } else {
+                // Убеждаемся, что экран входа виден
+                loginScreen.classList.remove('hidden');
+                appScreen.classList.add('hidden');
+            }
+        } catch(e) {
+            console.error('Ошибка проверки сессии:', e);
+            loginScreen.classList.remove('hidden');
+            appScreen.classList.add('hidden');
+        }
+    }
+    
+    // НАВЕШИВАЕМ ОБРАБОТЧИКИ
+    loginBtn.onclick = handleLogin;
+    
+    // Вход по клавише Enter
+    emailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
     
     // Выход
     logoutBtn.onclick = async () => {
         await supabase.auth.signOut();
         appScreen.classList.add('hidden');
         loginScreen.classList.remove('hidden');
-        document.getElementById('email').value = '';
-        document.getElementById('password').value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
     };
     
-    // Проверка сессии при загрузке
-    async function checkSession() {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-            loginScreen.classList.add('hidden');
-            appScreen.classList.remove('hidden');
-            await logLogin(session.user.email);
-            initCalculator();
-        }
-    }
-    
-    // ========== КАЛЬКУЛЯТОР (из предыдущего кода) ==========
+    // ========== КАЛЬКУЛЯТОР ==========
     const AGENT_NAMES = ['Средство А', 'Средство Б', 'Средство В', 'Средство Г', 'Средство Д', 'Средство Е'];
     const PUMP_COUNT = 6;
     let pumpFields = [];
@@ -163,18 +422,60 @@
     function createPumpRow(index) {
         const row = document.createElement('tr');
         const pumpNumber = index + 1;
-        row.innerHTML = `
-            <td><span class="badge-pump">${pumpNumber}</span></td>
-            <td><input type="number" class="calib" value="150" step="5" style="width:80px"></td>
-            <td><select class="agent-select" style="width:100px">${AGENT_NAMES.map((name, i) => `<option ${i === index % AGENT_NAMES.length ? 'selected' : ''}>${name}</option>`).join('')}</select></td>
-            <td><input type="number" class="norm" value="${(12 + index * 1.5).toFixed(1)}" step="0.5" style="width:70px"></td>
-            <td><span class="result-time">—</span></td>
-        `;
+        
+        const tdNumber = document.createElement('td');
+        tdNumber.innerHTML = `<span class="badge-pump">${pumpNumber}</span>`;
+        tdNumber.style.fontWeight = '600';
+        row.appendChild(tdNumber);
+        
+        const tdCalib = document.createElement('td');
+        const calibInput = document.createElement('input');
+        calibInput.type = 'number';
+        calibInput.value = '150';
+        calibInput.step = '5';
+        calibInput.placeholder = 'мл/30с';
+        calibInput.classList.add('calib');
+        tdCalib.appendChild(calibInput);
+        row.appendChild(tdCalib);
+        
+        const tdAgent = document.createElement('td');
+        const select = document.createElement('select');
+        select.classList.add('agent-select');
+        for (let i = 0; i < AGENT_NAMES.length; i++) {
+            const option = document.createElement('option');
+            option.value = AGENT_NAMES[i];
+            option.textContent = AGENT_NAMES[i];
+            if (i === index % AGENT_NAMES.length) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+        tdAgent.appendChild(select);
+        row.appendChild(tdAgent);
+        
+        const tdNorm = document.createElement('td');
+        const normInput = document.createElement('input');
+        normInput.type = 'number';
+        normInput.value = (12 + index * 1.5).toFixed(1);
+        normInput.step = '0.5';
+        normInput.placeholder = 'мл/кг';
+        normInput.classList.add('norm');
+        tdNorm.appendChild(normInput);
+        row.appendChild(tdNorm);
+        
+        const tdResult = document.createElement('td');
+        const resultSpan = document.createElement('span');
+        resultSpan.className = 'result-time';
+        resultSpan.textContent = '—';
+        tdResult.appendChild(resultSpan);
+        row.appendChild(tdResult);
+        
         pumpFields.push({
-            calibrationInput: row.querySelector('.calib'),
-            normInput: row.querySelector('.norm'),
-            resultSpan: row.querySelector('.result-time')
+            calibrationInput: calibInput,
+            normInput: normInput,
+            resultSpan: resultSpan
         });
+        
         return row;
     }
     
@@ -190,17 +491,23 @@
     function calculateAll() {
         let massKg = parseFloat(document.getElementById('laundryMass').value);
         if (isNaN(massKg) || massKg <= 0) massKg = 5.0;
+        
         for (let idx = 0; idx < pumpFields.length; idx++) {
             const fields = pumpFields[idx];
             let calibration30 = parseFloat(fields.calibrationInput.value);
             let normPerKg = parseFloat(fields.normInput.value);
+            
             if (isNaN(calibration30) || calibration30 <= 0 || isNaN(normPerKg) || normPerKg <= 0) {
                 fields.resultSpan.textContent = 'ошибка';
+                fields.resultSpan.style.background = '#fee2e2';
                 continue;
             }
+            
+            fields.resultSpan.style.background = '#eef2ff';
             const totalRequiredMl = massKg * normPerKg;
             const pumpRateMlPerSec = calibration30 / 30;
             const timeSeconds = totalRequiredMl / pumpRateMlPerSec;
+            
             let roundedSeconds = Math.round(timeSeconds);
             if (roundedSeconds === 0 && timeSeconds > 0) roundedSeconds = 1;
             fields.resultSpan.textContent = roundedSeconds + ' с';
@@ -210,14 +517,32 @@
     function initCalculator() {
         buildTable();
         calculateAll();
-        document.getElementById('calcButton').onclick = calculateAll;
-        document.getElementById('laundryMass').oninput = calculateAll;
+        
+        const calcButton = document.getElementById('calcButton');
+        const laundryMass = document.getElementById('laundryMass');
+        
+        calcButton.onclick = calculateAll;
+        laundryMass.oninput = calculateAll;
+        
         document.addEventListener('input', (e) => {
-            if (e.target.classList?.contains('calib') || e.target.classList?.contains('norm')) calculateAll();
+            if (e.target.classList && (e.target.classList.contains('calib') || e.target.classList.contains('norm'))) {
+                calculateAll();
+            }
         });
     }
     
+    // Запуск проверки сессии
     checkSession();
+</script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('SW registered:', reg);
+        }).catch(err => {
+            console.log('SW error:', err);
+        });
+    }
 </script>
 </body>
 </html>
