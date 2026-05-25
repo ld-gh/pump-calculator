@@ -1,893 +1,223 @@
 <!DOCTYPE html>
-
 <html lang="ru">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
     <title>Калькулятор насосов СМ</title>
-
-    <!-- PWA Meta -->
-
     <link rel="manifest" href="manifest.json">
-
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <meta name="apple-mobile-web-app-title" content="Насосы СМ">
-
-    <link rel="apple-touch-icon" href="icon-192.png">
-
     <style>
-
-        * {
-
-            box-sizing: border-box;
-
-            -webkit-tap-highlight-color: transparent;
-
-        }
-
-
-
+        * { box-sizing: border-box; }
         body {
-
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-
+            font-family: system-ui, sans-serif;
             background: #f1f5f9;
-
             margin: 0;
-
             padding: 16px;
-
-            color: #0f172a;
-
         }
-
-
-
-        .container {
-
-            max-width: 650px;
-
-            margin: 0 auto;
-
-        }
-
-
-
-        /* карточки */
-
+        .container { max-width: 400px; margin: 50px auto; }
         .card {
-
             background: white;
-
             border-radius: 24px;
-
-            padding: 20px 16px;
-
-            margin-bottom: 20px;
-
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-
-            transition: all 0.2s;
-
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
-
-
-        .card-header {
-
-            font-weight: 600;
-
-            font-size: 1.25rem;
-
-            margin-bottom: 18px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            color: #1e293b;
-
-            border-left: 4px solid #3b82f6;
-
-            padding-left: 12px;
-
-        }
-
-
-
-        .mass-row {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            flex-wrap: wrap;
-
-        }
-
-
-
-        .mass-row label {
-
-            font-weight: 500;
-
-            background: #eef2ff;
-
-            padding: 8px 14px;
-
-            border-radius: 40px;
-
-            font-size: 0.9rem;
-
-        }
-
-
-
-        input, select {
-
-            font-size: 1rem;
-
-            padding: 10px 12px;
-
-            border-radius: 16px;
-
-            border: 1px solid #cbd5e1;
-
-            background: white;
-
-            font-family: inherit;
-
-            transition: 0.1s;
-
-        }
-
-
-
-        input:focus, select:focus {
-
-            outline: none;
-
-            border-color: #3b82f6;
-
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-
-        }
-
-
-
-        .mass-input {
-
-            flex: 1;
-
-            min-width: 120px;
-
-        }
-
-
-
-        button {
-
-            background: #3b82f6;
-
-            color: white;
-
-            border: none;
-
-            border-radius: 40px;
-
-            padding: 12px 24px;
-
-            font-weight: 600;
-
-            font-size: 1rem;
-
-            cursor: pointer;
-
-            transition: 0.1s;
-
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-
-        }
-
-
-
-        button:active {
-
-            transform: scale(0.97);
-
-            background: #2563eb;
-
-        }
-
-
-
-        .calc-btn {
-
+        input, button {
             width: 100%;
-
-            margin-top: 8px;
-
-            font-size: 1.1rem;
-
-            padding: 14px;
-
-        }
-
-
-
-        /* таблица — адаптивная, прокрутка если надо */
-
-        .table-wrapper {
-
-            overflow-x: auto;
-
-            margin: 0 -4px;
-
-            padding: 0 4px;
-
-        }
-
-
-
-        .pumps-table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-            font-size: 0.85rem;
-
-        }
-
-
-
-        .pumps-table th, .pumps-table td {
-
-            padding: 12px 6px;
-
-            text-align: center;
-
-            border-bottom: 1px solid #e2e8f0;
-
-            vertical-align: middle;
-
-        }
-
-
-
-        .pumps-table th {
-
-            background: #f8fafc;
-
-            font-weight: 600;
-
-            color: #334155;
-
-            font-size: 0.75rem;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.5px;
-
-        }
-
-
-
-        .pumps-table input, .pumps-table select {
-
-            width: 100%;
-
-            min-width: 70px;
-
-            padding: 8px 6px;
-
-            font-size: 0.85rem;
-
+            padding: 12px;
+            margin: 8px 0;
             border-radius: 12px;
-
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
         }
-
-
-
-        .result-time {
-
-            font-weight: 700;
-
-            background: #eef2ff;
-
-            border-radius: 20px;
-
-            padding: 6px 4px;
-
-            display: inline-block;
-
-            min-width: 70px;
-
-            font-size: 0.9rem;
-
-            color: #1e40af;
-
-        }
-
-
-
-        .badge-pump {
-
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
             font-weight: 600;
-
-            background: #e2e8f0;
-
-            border-radius: 30px;
-
-            padding: 4px 8px;
-
-            font-size: 0.75rem;
-
-            display: inline-block;
-
+            cursor: pointer;
         }
-
-
-
-        .footer-note {
-
-            text-align: center;
-
-            font-size: 0.7rem;
-
-            color: #64748b;
-
-            margin-top: 20px;
-
+        .error { color: red; font-size: 0.8rem; margin-top: 8px; }
+        .hidden { display: none; }
+        .result-time {
+            background: #eef2ff;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-weight: 700;
         }
-
-
-
-        @media (max-width: 550px) {
-
-            .pumps-table th, .pumps-table td {
-
-                padding: 8px 4px;
-
-            }
-
-            .pumps-table input, .pumps-table select {
-
-                font-size: 0.8rem;
-
-                padding: 6px 4px;
-
-            }
-
-            .card {
-
-                padding: 16px;
-
-            }
-
-        }
-
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        input[type="number"], select { width: 80px; padding: 6px; border-radius: 8px; }
+        .table-wrapper { overflow-x: auto; }
     </style>
-
 </head>
-
 <body>
 
-<div class="container">
-
-    <!-- карточка массы белья -->
-
+<div id="loginScreen" class="container">
     <div class="card">
-
-        <div class="card-header">⚖️ Загрузка белья</div>
-
-        <div class="mass-row">
-
-            <label>Масса сухого белья (кг)</label>
-
-            <input type="number" id="laundryMass" class="mass-input" value="5.0" step="0.1" placeholder="кг">
-
-        </div>
-
-        <div style="font-size:0.7rem; color:#475569; margin-top: 10px;">
-
-            * Используется для всех насосов
-
-        </div>
-
+        <h2>Вход для дилеров</h2>
+        <input type="email" id="email" placeholder="Email дилера" required>
+        <input type="password" id="password" placeholder="Пароль" required>
+        <button id="loginBtn">Войти</button>
+        <div id="loginError" class="error"></div>
     </div>
-
-
-
-    <!-- главная таблица: насосы, средства, калибровка, норма -->
-
-    <div class="card">
-
-        <div class="card-header">🧴 Насосы & Средства</div>
-
-        <div class="table-wrapper">
-
-            <table class="pumps-table" id="pumpsTable">
-
-                <thead>
-
-                <tr>
-
-                    <th>№</th>
-
-                    <th>Калибровка<br><span style="font-weight:normal">мл за 30 сек</span></th>
-
-                    <th>Качает<br>средство</th>
-
-                    <th>Норма<br><span style="font-weight:normal">мл / кг белья</span></th>
-
-                    <th>Время<br><span style="font-weight:normal">(секунд)</span></th>
-
-                </tr>
-
-                </thead>
-
-                <tbody id="tableBody">
-
-                    <!-- строки будут добавлены js -->
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-        <button id="calcButton" class="calc-btn">🔄 ПЕРЕСЧИТАТЬ</button>
-
-        <div class="footer-note">
-
-            ⚡ Время работы насоса = (масса × норма) / (калибровка / 30)<br>
-
-            🕒 Округление до целых секунд
-
-        </div>
-
-    </div>
-
 </div>
 
+<div id="appScreen" class="container hidden">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card-header">⚖️ Калькулятор насосов</div>
+            <button id="logoutBtn" style="width: auto; background: #ef4444;">Выйти</button>
+        </div>
+        <label>Масса белья (кг):</label>
+        <input type="number" id="laundryMass" value="5.0" step="0.1">
+    </div>
+    <div class="card">
+        <div class="table-wrapper">
+            <table id="pumpsTable">
+                <thead><tr><th>№</th><th>Калибровка мл/30с</th><th>Средство</th><th>Норма мл/кг</th><th>Время (сек)</th></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <button id="calcButton">🔄 ПЕРЕСЧИТАТЬ</button>
+    </div>
+</div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-
-    // ---------- 6 предустановленных средств ----------
-
+    // ========== НАСТРОЙКИ SUPABASE (ЗАМЕНИТЕ НА СВОИ) ==========
+    const SUPABASE_URL = 'https://ВАШ_ПРОЕКТ.supabase.co';
+    const SUPABASE_ANON_KEY = 'ВАШ_ANON_KEY';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // DOM элементы
+    const loginScreen = document.getElementById('loginScreen');
+    const appScreen = document.getElementById('appScreen');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginError = document.getElementById('loginError');
+    
+    // Функция записи входа в таблицу
+    async function logLogin(dealerEmail) {
+        try {
+            const userAgent = navigator.userAgent;
+            // IP адрес получаем через бесплатный сервис
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            
+            await supabase.from('dealer_logins').insert([{
+                dealer_email: dealerEmail,
+                user_agent: userAgent,
+                ip_address: ipData.ip
+            }]);
+        } catch(e) {
+            console.log('Ошибка логирования:', e);
+        }
+    }
+    
+    // Вход
+    loginBtn.onclick = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        
+        if (error) {
+            loginError.textContent = 'Ошибка: неверный email или пароль';
+        } else {
+            // Записываем факт входа
+            await logLogin(email);
+            // Показываем основной экран
+            loginScreen.classList.add('hidden');
+            appScreen.classList.remove('hidden');
+            initCalculator();
+        }
+    };
+    
+    // Выход
+    logoutBtn.onclick = async () => {
+        await supabase.auth.signOut();
+        appScreen.classList.add('hidden');
+        loginScreen.classList.remove('hidden');
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+    };
+    
+    // Проверка сессии при загрузке
+    async function checkSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            loginScreen.classList.add('hidden');
+            appScreen.classList.remove('hidden');
+            await logLogin(session.user.email);
+            initCalculator();
+        }
+    }
+    
+    // ========== КАЛЬКУЛЯТОР (из предыдущего кода) ==========
     const AGENT_NAMES = ['Средство А', 'Средство Б', 'Средство В', 'Средство Г', 'Средство Д', 'Средство Е'];
-
-    
-
-    // количество насосов
-
     const PUMP_COUNT = 6;
-
+    let pumpFields = [];
     
-
-    // Получаем элементы DOM
-
-    const tbody = document.getElementById('tableBody');
-
-    const laundryInput = document.getElementById('laundryMass');
-
-    const calcBtn = document.getElementById('calcButton');
-
-    
-
-    // Хранилище ссылок на поля ввода для быстрого доступа при расчете
-
-    // каждый насос: { calibrationInput, agentSelect, normInput, resultSpan }
-
-    const pumpFields = [];
-
-    
-
-    // Функция создания строки для насоса i (1-indexed для пользователя)
-
     function createPumpRow(index) {
-
         const row = document.createElement('tr');
-
         const pumpNumber = index + 1;
-
-        
-
-        // ячейка номер насоса
-
-        const tdNumber = document.createElement('td');
-
-        tdNumber.innerHTML = `<span class="badge-pump">${pumpNumber}</span>`;
-
-        tdNumber.style.fontWeight = '600';
-
-        row.appendChild(tdNumber);
-
-        
-
-        // ячейка калибровки (мл за 30 сек) - знач. по умолчанию 150
-
-        const tdCalib = document.createElement('td');
-
-        const calibInput = document.createElement('input');
-
-        calibInput.type = 'number';
-
-        calibInput.value = '150';
-
-        calibInput.step = '5';
-
-        calibInput.placeholder = 'мл/30с';
-
-        calibInput.style.minWidth = '80px';
-
-        tdCalib.appendChild(calibInput);
-
-        row.appendChild(tdCalib);
-
-        
-
-        // ячейка выбора средства (select)
-
-        const tdAgent = document.createElement('td');
-
-        const select = document.createElement('select');
-
-        for (let i = 0; i < AGENT_NAMES.length; i++) {
-
-            const option = document.createElement('option');
-
-            option.value = AGENT_NAMES[i];
-
-            option.textContent = AGENT_NAMES[i];
-
-            // для разнообразия: назначаем разные дефолтные средства для наглядности
-
-            if (i === index % AGENT_NAMES.length) {
-
-                option.selected = true;
-
-            }
-
-            select.appendChild(option);
-
-        }
-
-        tdAgent.appendChild(select);
-
-        row.appendChild(tdAgent);
-
-        
-
-        // ячейка нормы (мл/кг) - по умолчанию: разные значения для примера
-
-        const tdNorm = document.createElement('td');
-
-        const normInput = document.createElement('input');
-
-        normInput.type = 'number';
-
-        normInput.value = (12 + index * 1.5).toFixed(1); // 13.5, 15.0, 16.5 ... разнообразие
-
-        normInput.step = '0.5';
-
-        normInput.placeholder = 'мл/кг';
-
-        normInput.style.minWidth = '80px';
-
-        tdNorm.appendChild(normInput);
-
-        row.appendChild(tdNorm);
-
-        
-
-        // ячейка результата (время в секундах)
-
-        const tdResult = document.createElement('td');
-
-        const resultSpan = document.createElement('span');
-
-        resultSpan.className = 'result-time';
-
-        resultSpan.textContent = '—';
-
-        tdResult.appendChild(resultSpan);
-
-        row.appendChild(tdResult);
-
-        
-
-        // Сохраняем элементы для дальнейших расчетов
-
+        row.innerHTML = `
+            <td><span class="badge-pump">${pumpNumber}</span></td>
+            <td><input type="number" class="calib" value="150" step="5" style="width:80px"></td>
+            <td><select class="agent-select" style="width:100px">${AGENT_NAMES.map((name, i) => `<option ${i === index % AGENT_NAMES.length ? 'selected' : ''}>${name}</option>`).join('')}</select></td>
+            <td><input type="number" class="norm" value="${(12 + index * 1.5).toFixed(1)}" step="0.5" style="width:70px"></td>
+            <td><span class="result-time">—</span></td>
+        `;
         pumpFields.push({
-
-            calibrationInput: calibInput,
-
-            agentSelect: select,
-
-            normInput: normInput,
-
-            resultSpan: resultSpan
-
+            calibrationInput: row.querySelector('.calib'),
+            normInput: row.querySelector('.norm'),
+            resultSpan: row.querySelector('.result-time')
         });
-
-        
-
         return row;
-
     }
-
     
-
-    // Построить всю таблицу
-
     function buildTable() {
-
-        tbody.innerHTML = ''; // очистить
-
-        pumpFields.length = 0; // очистить массив
-
-        
-
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        pumpFields = [];
         for (let i = 0; i < PUMP_COUNT; i++) {
-
-            const row = createPumpRow(i);
-
-            tbody.appendChild(row);
-
+            tbody.appendChild(createPumpRow(i));
         }
-
     }
-
     
-
-    // Основная функция расчёта времени для всех насосов
-
     function calculateAll() {
-
-        // 1. Получаем массу белья (кг)
-
-        let massKg = parseFloat(laundryInput.value);
-
-        if (isNaN(massKg) || massKg <= 0) {
-
-            massKg = 0;
-
-            // но для сообщения: если некорректно, покажем ошибку
-
-            if (isNaN(parseFloat(laundryInput.value))) {
-
-                alert('Пожалуйста, введите корректную массу белья (положительное число)');
-
-                laundryInput.value = '5.0';
-
-                massKg = 5.0;
-
-            } else if (massKg <= 0) {
-
-                alert('Масса белья должна быть больше 0 кг');
-
-                laundryInput.value = '0.5';
-
-                massKg = 0.5;
-
-            }
-
-        }
-
-        
-
-        // 2. Пройдём по всем насосам и вычислим
-
+        let massKg = parseFloat(document.getElementById('laundryMass').value);
+        if (isNaN(massKg) || massKg <= 0) massKg = 5.0;
         for (let idx = 0; idx < pumpFields.length; idx++) {
-
             const fields = pumpFields[idx];
-
-            
-
-            // Калибровка: сколько мл средство прокачивается за 30 секунд
-
             let calibration30 = parseFloat(fields.calibrationInput.value);
-
-            if (isNaN(calibration30) || calibration30 <= 0) {
-
-                fields.resultSpan.textContent = 'ошибка';
-
-                fields.resultSpan.style.background = '#fee2e2';
-
-                continue;
-
-            } else {
-
-                fields.resultSpan.style.background = '#eef2ff';
-
-            }
-
-            
-
-            // Норма расхода (мл на 1 кг белья)
-
             let normPerKg = parseFloat(fields.normInput.value);
-
-            if (isNaN(normPerKg) || normPerKg <= 0) {
-
-                fields.resultSpan.textContent = 'норма ?';
-
-                fields.resultSpan.style.background = '#fee2e2';
-
+            if (isNaN(calibration30) || calibration30 <= 0 || isNaN(normPerKg) || normPerKg <= 0) {
+                fields.resultSpan.textContent = 'ошибка';
                 continue;
-
             }
-
-            
-
-            // Расчёт: общее количество средства = масса * норма (мл)
-
             const totalRequiredMl = massKg * normPerKg;
-
-            
-
-            // Скорость насоса: мл в секунду = calibration30 / 30
-
             const pumpRateMlPerSec = calibration30 / 30;
-
-            
-
-            if (pumpRateMlPerSec <= 0) {
-
-                fields.resultSpan.textContent = 'скор.=0';
-
-                continue;
-
-            }
-
-            
-
             const timeSeconds = totalRequiredMl / pumpRateMlPerSec;
-
-            
-
-            // Округление до ЦЕЛЫХ секунд (математическое округление)
-
-            let roundedSeconds;
-
-            if (isFinite(timeSeconds) && timeSeconds > 0) {
-
-                roundedSeconds = Math.round(timeSeconds);
-
-                // Дополнительная проверка: если время получилось 0 секунд при положительном расходе,
-
-                // покажем хотя бы 1 секунду (минимальное время)
-
-                if (roundedSeconds === 0 && timeSeconds > 0) {
-
-                    roundedSeconds = 1;
-
-                }
-
-                fields.resultSpan.textContent = roundedSeconds + ' с';
-
-            } else {
-
-                fields.resultSpan.textContent = '0 с';
-
-            }
-
+            let roundedSeconds = Math.round(timeSeconds);
+            if (roundedSeconds === 0 && timeSeconds > 0) roundedSeconds = 1;
+            fields.resultSpan.textContent = roundedSeconds + ' с';
         }
-
-        
-
-        // небольшая анимация кнопки для отклика
-
-        calcBtn.style.transform = 'scale(0.98)';
-
-        setTimeout(() => { calcBtn.style.transform = ''; }, 100);
-
     }
-
     
-
-    // Автоматический пересчет при изменении любых полей (по желанию)
-
-    // Для удобства: при ручном редактировании любого поля вызываем пересчёт.
-
-    function attachAutoRecalculate() {
-
-        // событие для всех input/select динамически - через делегирование
-
-        const container = document.querySelector('.container');
-
-        container.addEventListener('input', (e) => {
-
-            const tag = e.target.tagName;
-
-            if (tag === 'INPUT' || tag === 'SELECT') {
-
-                // Игнорируем только если это не массa? нет, массу тоже отслеживаем
-
-                calculateAll();
-
-            }
-
+    function initCalculator() {
+        buildTable();
+        calculateAll();
+        document.getElementById('calcButton').onclick = calculateAll;
+        document.getElementById('laundryMass').oninput = calculateAll;
+        document.addEventListener('input', (e) => {
+            if (e.target.classList?.contains('calib') || e.target.classList?.contains('norm')) calculateAll();
         });
-
-        // дополнительно следим за изменением массы через ручной ввод
-
-        laundryInput.addEventListener('change', calculateAll);
-
-        laundryInput.addEventListener('input', calculateAll);
-
-        
-
-        // кнопка пересчитать на всякий случай дублирует (но auto уже сработает)
-
-        calcBtn.addEventListener('click', (e) => {
-
-            e.preventDefault();
-
-            calculateAll();
-
-        });
-
     }
-
     
-
-    // Инициализация приложения
-
-    function init() {
-
-        buildTable();           // создаём строки насосов
-
-        attachAutoRecalculate(); // вешаем события авто-расчёта
-
-        calculateAll();         // первый расчёт с дефолтными данными
-
-    }
-
-    
-
-    // Запуск
-
-    init();
-
+    checkSession();
 </script>
-
-
-
-<!-- Дополнительно для PWA: service worker регистрация -->
-
-<script>
-
-    if ('serviceWorker' in navigator) {
-
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-
-            console.log('SW registered:', reg);
-
-        }).catch(err => {
-
-            console.log('SW error:', err);
-
-        });
-
-    }
-
-</script>
-
 </body>
-
 </html>
