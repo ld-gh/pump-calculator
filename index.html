@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Калькулятор насосов СМ</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Насосы СМ">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -83,10 +83,6 @@
         .error { color: #dc2626; font-size: 0.8rem; margin-top: 12px; text-align: center; }
         .login-container { max-width: 400px; margin: 50px auto; }
         .login-title { text-align: center; margin-bottom: 24px; color: #1e293b; }
-        .loading-badge {
-            background: #fbbf24; color: #78350f; padding: 4px 10px;
-            border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-        }
         @media (max-width: 550px) {
             .pumps-table th, .pumps-table td { padding: 8px 4px; }
             .pumps-table input, .pumps-table select { font-size: 0.8rem; padding: 6px 4px; }
@@ -160,7 +156,7 @@
 
     // DOM элементы
     const loginScreen = document.getElementById('loginScreen');
-    const appScreen = document.getElementById('appScreen');
+    const appScreen = document.getElementById('appScreen');  // ИСПРАВЛЕНО
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const loginError = document.getElementById('loginError');
@@ -189,6 +185,13 @@
     async function logLogin(dealerEmail) {
         if (!supabase) return;
         try {
+            // Проверяем, существует ли таблица (опционально)
+            const { error: tableCheck } = await supabase.from('dealer_logins').select('id').limit(1);
+            if (tableCheck && tableCheck.code === '42P01') {
+                console.warn('⚠️ Таблица dealer_logins не создана в Supabase');
+                return;
+            }
+            
             const userAgent = navigator.userAgent;
             const ipRes = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipRes.json();
@@ -283,8 +286,14 @@
         loginScreen.classList.remove('hidden');
         emailInput.value = '';
         passwordInput.value = '';
-        // Сбрасываем калькулятор при следующем входе
+        
+        // Правильная очистка обработчиков
+        if (inputHandler) {
+            document.removeEventListener('input', inputHandler);
+            inputHandler = null;
+        }
         calculatorInitialized = false;
+        pumpFields = [];
     }
 
     // ========== КАЛЬКУЛЯТОР ==========
