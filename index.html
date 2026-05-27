@@ -143,294 +143,110 @@
     </div>   
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/index.min.js"></script>
 <script>
-    // ========== НАСТРОЙКИ SUPABASE ==========
-    const SUPABASE_URL = 'https://sifudxpuhuuolkztefrb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZnVkeHB1aHV1b2xrenRlZnJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDEwNTksImV4cCI6MjA5NTI3NzA1OX0.LsveQ2iX17IyUTMhEa_VK2Zy6GkXWrvsd0CqzU4og8E';
-    
-    var supabase = null;
-    let isSupabaseReady = false;
-    let calculatorInitialized = false;
-    let inputHandler = null;
-
-    // DOM элементы
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM элементы (ищем только после загрузки страницы)
     const loginScreen = document.getElementById('loginScreen');
-    const appScreen = document.getElementById('appScreen');  // ИСПРАВЛЕНО
+    const appScreen = document.getElementById('appScreen');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const loginError = document.getElementById('loginError');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
 
-    // ========== ИНИЦИАЛИЗАЦИЯ SUPABASE ==========
-    async function initSupabaseClient() {
-        // Ждём загрузки CDN-скрипта
-        while (!window.supabase) {
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
+    const SUPABASE_URL = 'https://sifudxpuhuuolkztefrb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpZnVkeHB1aHV1b2xrenRlZnJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDEwNTksImV4cCI6MjA5NTI3NzA1OX0.LsveQ2iX17IyUTMhEa_VK2Zy6GkXWrvsd0CqzU4og8E';
+
+    let supabase = null;
+    let calculatorInitialized = false;
+    let inputHandler = null;
+    const AGENT_NAMES = ['Средство А', 'Средство Б', 'Средство В', 'Средство Г', 'Средство Д', 'Средство Е'];
+    let pumpFields = [];
+
+    // Инициализация
+    if (typeof window.supabase === 'undefined') {
+        loginBtn.textContent = '❌ Ошибка CDN';
+        console.error('Supabase не загружен');
+    } else {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        isSupabaseReady = true;
-        console.log('✅ Supabase готов');
-        
-        // Активируем кнопку входа
         loginBtn.disabled = false;
         loginBtn.textContent = 'Войти';
-        
-        // Проверяем сессию
-        await checkSession();
+        checkSession();
     }
 
-    // ========== ЛОГИРОВАНИЕ ВХОДА ==========
-    async function logLogin(dealerEmail) {
+    async function checkSession() {
         if (!supabase) return;
         try {
-            // Проверяем, существует ли таблица (опционально)
-            const { error: tableCheck } = await supabase.from('dealer_logins').select('id').limit(1);
-            if (tableCheck && tableCheck.code === '42P01') {
-                console.warn('⚠️ Таблица dealer_logins не создана в Supabase');
-                return;
+            const { data } = await supabase.auth.getSession();
+            if (data.session) {
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                initCalculator();
             }
-            
-            const userAgent = navigator.userAgent;
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            
-            const { error } = await supabase.from('dealer_logins').insert([{
-                dealer_email: dealerEmail,
-                user_agent: userAgent,
-                ip_address: ipData.ip
-            }]);
-            if (error) console.warn('⚠️ Ошибка логирования:', error);
-        } catch(e) {
-            console.warn('⚠️ Ошибка логирования:', e);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    // ========== ВХОД ==========
-    async function handleLogin() {
-        if (!isSupabaseReady || !supabase) {
-            loginError.textContent = '⏳ Сервис загружается...';
-            return;
-        }
-
+    loginBtn.onclick = async () => {
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Вход...';
         loginError.textContent = '';
         const email = emailInput.value.trim();
         const password = passwordInput.value;
-        
-        if (!email || !password) {
-            loginError.textContent = 'Введите email и пароль';
-            return;
-        }
-        
-        loginBtn.disabled = true;
-        loginBtn.textContent = 'Вход...';
-        
+        if (!email || !password) { loginError.textContent = 'Введите email и пароль'; loginBtn.disabled = false; loginBtn.textContent = 'Войти'; return; }
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-            
-            if (error) {
-                console.error('❌ Ошибка авторизации:', error);
-                loginError.textContent = 'Неверный email или пароль';
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Войти';
-                return;
-            }
-            
-            if (data?.user) {
-                // Логируем вход (не блокируя интерфейс)
-                logLogin(data.user.email);
-                
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                initCalculator();
-            }
-        } catch (err) {
-            console.error('❌ Ошибка:', err);
-            loginError.textContent = 'Ошибка соединения. Проверьте интернет.';
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Войти';
-        }
-    }
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { loginError.textContent = error.message; loginBtn.disabled = false; loginBtn.textContent = 'Войти'; return; }
+            loginScreen.classList.add('hidden'); appScreen.classList.remove('hidden'); initCalculator();
+        } catch(e) { loginError.textContent = 'Ошибка сети'; loginBtn.disabled = false; loginBtn.textContent = 'Войти'; }
+    };
 
-    // ========== ПРОВЕРКА СЕССИИ ==========
-    async function checkSession() {
-        if (!supabase) return;
-        
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                await logLogin(session.user.email);
-                initCalculator();
-            } else {
-                loginScreen.classList.remove('hidden');
-                appScreen.classList.add('hidden');
-            }
-        } catch(e) {
-            console.error('❌ Ошибка проверки сессии:', e);
-            loginScreen.classList.remove('hidden');
-            appScreen.classList.add('hidden');
-        }
-    }
-
-    // ========== ВЫХОД ==========
-    async function handleLogout() {
-        if (!supabase) return;
+    logoutBtn.onclick = async () => {
         await supabase.auth.signOut();
-        appScreen.classList.add('hidden');
-        loginScreen.classList.remove('hidden');
-        emailInput.value = '';
-        passwordInput.value = '';
-        
-        // Правильная очистка обработчиков
-        if (inputHandler) {
-            document.removeEventListener('input', inputHandler);
-            inputHandler = null;
-        }
-        calculatorInitialized = false;
-        pumpFields = [];
-    }
+        appScreen.classList.add('hidden'); loginScreen.classList.remove('hidden');
+        emailInput.value = ''; passwordInput.value = '';
+        if (inputHandler) document.removeEventListener('input', inputHandler);
+        calculatorInitialized = false; pumpFields = [];
+    };
 
-    // ========== КАЛЬКУЛЯТОР ==========
-    const AGENT_NAMES = ['Средство А', 'Средство Б', 'Средство В', 'Средство Г', 'Средство Д', 'Средство Е'];
-    const PUMP_COUNT = 6;
-    let pumpFields = [];
-    
-    function createPumpRow(index) {
-        const row = document.createElement('tr');
-        const pumpNumber = index + 1;
-        
-        const tdNumber = document.createElement('td');
-        tdNumber.innerHTML = `<span class="badge-pump">${pumpNumber}</span>`;
-        tdNumber.style.fontWeight = '600';
-        row.appendChild(tdNumber);
-        
-        const tdCalib = document.createElement('td');
-        const calibInput = document.createElement('input');
-        calibInput.type = 'number';
-        calibInput.value = '150';
-        calibInput.step = '5';
-        calibInput.placeholder = 'мл/30с';
-        calibInput.classList.add('calib');
-        tdCalib.appendChild(calibInput);
-        row.appendChild(tdCalib);
-        
-        const tdAgent = document.createElement('td');
-        const select = document.createElement('select');
-        select.classList.add('agent-select');
-        for (let i = 0; i < AGENT_NAMES.length; i++) {
-            const option = document.createElement('option');
-            option.value = AGENT_NAMES[i];
-            option.textContent = AGENT_NAMES[i];
-            if (i === index % AGENT_NAMES.length) option.selected = true;
-            select.appendChild(option);
-        }
-        tdAgent.appendChild(select);
-        row.appendChild(tdAgent);
-        
-        const tdNorm = document.createElement('td');
-        const normInput = document.createElement('input');
-        normInput.type = 'number';
-        normInput.value = (12 + index * 1.5).toFixed(1);
-        normInput.step = '0.5';
-        normInput.placeholder = 'мл/кг';
-        normInput.classList.add('norm');
-        tdNorm.appendChild(normInput);
-        row.appendChild(tdNorm);
-        
-        const tdResult = document.createElement('td');
-        const resultSpan = document.createElement('span');
-        resultSpan.className = 'result-time';
-        resultSpan.textContent = '—';
-        tdResult.appendChild(resultSpan);
-        row.appendChild(tdResult);
-        
-        pumpFields.push({
-            calibrationInput: calibInput,
-            normInput: normInput,
-            resultSpan: resultSpan
-        });
-        
-        return row;
-    }
-    
-    function buildTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        pumpFields = [];
-        for (let i = 0; i < PUMP_COUNT; i++) {
-            tbody.appendChild(createPumpRow(i));
-        }
-    }
-    
-    function calculateAll() {
-        let massKg = parseFloat(document.getElementById('laundryMass').value);
-        if (isNaN(massKg) || massKg <= 0) massKg = 5.0;
-        
-        for (let idx = 0; idx < pumpFields.length; idx++) {
-            const fields = pumpFields[idx];
-            let calibration30 = parseFloat(fields.calibrationInput.value);
-            let normPerKg = parseFloat(fields.normInput.value);
-            
-            if (isNaN(calibration30) || calibration30 <= 0 || isNaN(normPerKg) || normPerKg <= 0) {
-                fields.resultSpan.textContent = 'ошибка';
-                fields.resultSpan.style.background = '#fee2e2';
-                continue;
-            }
-            
-            fields.resultSpan.style.background = '#eef2ff';
-            const totalRequiredMl = massKg * normPerKg;
-            const pumpRateMlPerSec = calibration30 / 30;
-            const timeSeconds = totalRequiredMl / pumpRateMlPerSec;
-            
-            let roundedSeconds = Math.round(timeSeconds);
-            if (roundedSeconds === 0 && timeSeconds > 0) roundedSeconds = 1;
-            fields.resultSpan.textContent = roundedSeconds + ' с';
-        }
-    }
-    
+    [emailInput, passwordInput].forEach(el => el.addEventListener('keypress', e => { if (e.key === 'Enter') loginBtn.click(); }));
+
     function initCalculator() {
-        // Защита от повторной инициализации
         if (calculatorInitialized) return;
         calculatorInitialized = true;
-        
-        buildTable();
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = ''; pumpFields = [];
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><span class="badge-pump">${i+1}</span></td>
+                <td><input type="number" class="calib" value="150" step="5"></td>
+                <td><select class="agent-select">${AGENT_NAMES.map((n,j) => `<option ${j===i%6?'selected':''}>${n}</option>`).join('')}</select></td>
+                <td><input type="number" class="norm" value="${(12+i*1.5).toFixed(1)}" step="0.5"></td>
+                <td><span class="result-time">—</span></td>
+            `;
+            tbody.appendChild(row);
+            pumpFields.push({ calib: row.querySelector('.calib'), norm: row.querySelector('.norm'), res: row.querySelector('.result-time') });
+        }
         calculateAll();
-        
-        const calcButton = document.getElementById('calcButton');
-        const laundryMass = document.getElementById('laundryMass');
-        
-        calcButton.onclick = calculateAll;
-        laundryMass.oninput = calculateAll;
-        
-        // Создаём обработчик один раз
-        inputHandler = (e) => {
-            if (e.target.classList && 
-                (e.target.classList.contains('calib') || e.target.classList.contains('norm'))) {
-                calculateAll();
-            }
-        };
+        inputHandler = (e) => { if (e.target.classList.contains('calib') || e.target.classList.contains('norm')) calculateAll(); };
         document.addEventListener('input', inputHandler);
+        document.getElementById('calcButton').onclick = calculateAll;
+        document.getElementById('laundryMass').oninput = calculateAll;
     }
 
-    // ========== ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ==========
-    document.addEventListener('DOMContentLoaded', () => {
-        // Навешиваем обработчики сразу (они безопасны благодаря проверкам внутри)
-        loginBtn.onclick = handleLogin;
-        logoutBtn.onclick = handleLogout;
-        
-        // Enter в полях входа
-        emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
-        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
-        
-        // Инициализируем Supabase
-        initSupabaseClient();
-    });
+    function calculateAll() {
+        let mass = parseFloat(document.getElementById('laundryMass').value) || 5;
+        pumpFields.forEach(f => {
+            let cal = parseFloat(f.calib.value);
+            let norm = parseFloat(f.norm.value);
+            if (isNaN(cal) || cal <= 0 || isNaN(norm) || norm <= 0) { f.res.textContent = 'ошибка'; f.res.style.background = '#fee2e2'; return; }
+            f.res.style.background = '#eef2ff';
+            let sec = Math.round((mass * norm) / (cal / 30));
+            f.res.textContent = (sec === 0 ? 1 : sec) + ' с';
+        });
+    }
+});
 </script>
 
 // <script>
