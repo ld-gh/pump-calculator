@@ -433,15 +433,15 @@
     });
 </script>
 
-<script>
-    // Service Worker для PWA
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('✅ SW registered:', reg);
-        }).catch(err => {
-            console.warn('⚠️ SW error:', err);
-        });
-    }
-</script>
+// <script>
+    // Service Worker для PWA Офф-лайн режим. Закомментирован, т.к. вызывал ошибку в отладке. Исправить позже
+   // if ('serviceWorker' in navigator) {
+     //   navigator.serviceWorker.register('/sw.js').then(reg => {
+       //     console.log('✅ SW registered:', reg);
+      //  }).catch(err => {
+        //    console.warn('⚠️ SW error:', err);
+      //  });
+  //  }
+// </script>
 </body>
 </html>
