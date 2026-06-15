@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Калькулятор насосов СМ</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="manifest" href="/pump-calculator/manifest.json">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/3b82f6/ffffff?text=СМ">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Насосы СМ">
-    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
@@ -249,15 +247,47 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-// <script>
-    // Service Worker для PWA Офф-лайн режим. Закомментирован, т.к. вызывал ошибку в отладке. Исправить позже
-   // if ('serviceWorker' in navigator) {
-     //   navigator.serviceWorker.register('/sw.js').then(reg => {
-       //     console.log('✅ SW registered:', reg);
-      //  }).catch(err => {
-        //    console.warn('⚠️ SW error:', err);
-      //  });
-  //  }
-// </script>
+<script>
+// Регистрация Service Worker с обработкой обновлений
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/pump-calculator/sw.js')
+      .then((reg) => {
+        console.log('✅ SW registered:', reg.scope);
+        
+        // Проверка обновлений
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('🔄 Доступно обновление');
+              // Можно показать пользователю кнопку "Обновить"
+            }
+          });
+        });
+      })
+      .catch((err) => console.warn('⚠️ SW error:', err));
+  });
+  
+  // Индикатор оффлайн-режима
+  function updateOnlineStatus() {
+    const indicator = document.getElementById('offlineIndicator');
+    if (navigator.onLine) {
+      if (indicator) indicator.remove();
+    } else {
+      if (!indicator) {
+        const div = document.createElement('div');
+        div.id = 'offlineIndicator';
+        div.textContent = '📴 Оффлайн-режим';
+        div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f59e0b;color:#fff;text-align:center;padding:8px;font-size:0.85rem;z-index:9999;';
+        document.body.insertBefore(div, document.body.firstChild);
+      }
+    }
+  }
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus();
+}
+</script>
 </body>
 </html>
